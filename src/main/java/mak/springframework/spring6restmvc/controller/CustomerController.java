@@ -24,6 +24,7 @@ import java.util.UUID;
 public class CustomerController {
     private final CustomerService customerService;
 
+
     @RequestMapping(method = RequestMethod.GET)
     public List<Customer> listCustomers() {
         return customerService.listCustomers();
@@ -31,7 +32,7 @@ public class CustomerController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Customer getCustomerById(@PathVariable UUID id) {
-        log.debug("Get Customer By Id - in controller");
+        log.debug("Get Customer By Id - in controller err3rete ");
         return customerService.getCustomerById(id);
     }
 }
