@@ -1,12 +1,15 @@
 package mak.springframework.spring6restmvc.service;
 
-import mak.springframework.spring6restmvc.model.Beer;
+
+import mak.springframework.spring6restmvc.model.Customer;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface BeerService {
-    List<Beer> listBeers();
 
-    Beer getBeerById(UUID id);
+public interface CustomerService {
+    List<Customer> listCustomers();
+
+    Customer getCustomerById(UUID id);
 }

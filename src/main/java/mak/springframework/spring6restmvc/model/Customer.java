@@ -13,14 +13,10 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class Beer {
+public class Customer {
     private UUID id;
     private Integer version;
-    private String beerName;
-    private String beerStyle;
-    private String upc;
-    private Integer quantityOnHand;
-    private BigDecimal price;
+    private String customerName;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 }
