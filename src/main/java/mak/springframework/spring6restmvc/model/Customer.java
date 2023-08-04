@@ -19,4 +19,5 @@ public class Customer {
     private String customerName;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+
 }
