@@ -1,7 +1,7 @@
 package mak.springframework.spring6restmvc.controller;
 
 
-import lombok.AllArgsConstructor;
+ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mak.springframework.spring6restmvc.model.Beer;
 import mak.springframework.spring6restmvc.service.BeerService;
@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/beer")
 public class BeerController {
     private final BeerService beerService;
@@ -65,7 +65,7 @@ public class BeerController {
 
     @RequestMapping(value = "/{beerId}", method = RequestMethod.GET)
     public Beer getBeerById(@PathVariable UUID beerId) {
-        log.debug("Get Beer By Id - in controller");
+       // log.debug("Get Beer By Id - in controller");
         return beerService.getBeerById(beerId);
     }
 }
