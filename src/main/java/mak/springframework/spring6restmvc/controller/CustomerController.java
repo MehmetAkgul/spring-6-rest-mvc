@@ -2,6 +2,7 @@ package mak.springframework.spring6restmvc.controller;
 
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mak.springframework.spring6restmvc.model.Customer;
 import mak.springframework.spring6restmvc.service.CustomerService;
@@ -18,7 +19,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/customer")
 public class CustomerController {
     private final CustomerService customerService;
