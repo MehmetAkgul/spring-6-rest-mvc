@@ -1,5 +1,7 @@
 package mak.springframework.spring6restmvc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import mak.springframework.spring6restmvc.model.Beer;
 import mak.springframework.spring6restmvc.service.BeerService;
 import mak.springframework.spring6restmvc.service.BeerServiceImpl;
@@ -23,10 +25,22 @@ class BeerControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @MockBean
     BeerService beerService;
 
     BeerServiceImpl beerServiceImpl = new BeerServiceImpl();
+
+    @Test
+    void testCreateNewBeer() throws JsonProcessingException {
+
+
+        Beer beer = beerServiceImpl.listBeers().get(0);
+
+        System.out.println(objectMapper.writeValueAsString(beer));
+    }
 
 
     @Test
@@ -36,8 +50,8 @@ class BeerControllerTest {
         given(beerService.getBeerById(testBeer.getId())).willReturn(testBeer);
 
         mockMvc.perform(
-                get("/api/v1/beer/" + testBeer.getId())
-                        .accept(MediaType.APPLICATION_JSON)
+                        get("/api/v1/beer/" + testBeer.getId())
+                                .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
