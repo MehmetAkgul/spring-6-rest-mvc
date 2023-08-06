@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import mak.springframework.spring6restmvc.model.Beer;
 import mak.springframework.spring6restmvc.service.BeerService;
 import mak.springframework.spring6restmvc.service.BeerServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,8 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -27,19 +30,42 @@ class BeerControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+    /*
+    ObjectMapper Jackson kütüphanesi tarafından sağlanan bir sınıftır
+    ve JSON ile Java nesneleri arasında dönüşüm yapmaya yarar.
+    Bu sınıf sayesinde Java nesneleri kolayca JSON formatına dönüştürülebilir
+    veya JSON formatındaki bir metin Java nesnesine dönüştürülebilir.
+     */
 
     @MockBean
     BeerService beerService;
 
-    BeerServiceImpl beerServiceImpl = new BeerServiceImpl();
+    BeerServiceImpl beerServiceImpl;
+
+    @BeforeEach
+    void setUp() {
+        beerServiceImpl = new BeerServiceImpl();
+    }
 
     @Test
-    void testCreateNewBeer() throws JsonProcessingException {
-
+    void testCreateNewBeer() throws Exception {
 
         Beer beer = beerServiceImpl.listBeers().get(0);
 
-        System.out.println(objectMapper.writeValueAsString(beer));
+        beer.setVersion(null);
+        beer.setId(null);
+
+        given(beerService.saveNewBeer(any(Beer.class))).willReturn(beerServiceImpl.listBeers().get(1));
+
+        mockMvc.perform(
+                        post("/api/v1/beer")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beer))
+                )
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"));
+
     }
 
 
@@ -72,3 +98,26 @@ class BeerControllerTest {
                 .andExpect(jsonPath("$.length()", is(3)));
     }
 }
+
+
+/*
+Jackson kütüphanesi, Java'da JSON ile çalışmak için en yaygın olarak kullanılan kütüphanelerden biridir. JSON formatındaki veriyi Java nesnelerine dönüştürme (deserialization) ve Java nesnelerini JSON formatına dönüştürme (serialization) işlemleri için kullanılır. Jackson, performansı, esnekliği ve kolay kullanımı ile bilinir.
+
+Jackson'ın başlıca özellikleri şunlardır:
+
+1. **Hızlı ve Etkin:** Jackson, hızlı bir şekilde JSON serialization ve deserialization işlemlerini gerçekleştirir.
+
+2. **Esneklik:** Jackson, çok sayıda yapılandırma seçeneği sunar. Örneğin, sadece belirli özelliklerin dönüştürülmesini isteyip istemediğinizi, belirli isimlendirmeleri nasıl kullanacağınızı ve daha birçok şeyi özelleştirebilirsiniz.
+
+3. **Annotations (Anotasyonlar):** Jackson, JSON ile çalışırken farklı davranışları özelleştirmek için birçok anotasyon sunar. Örneğin, `@JsonProperty` veya `@JsonIgnore` gibi anotasyonlarla nesnelerin nasıl serialize edileceğini veya deserialize edileceğini kontrol edebilirsiniz.
+
+4. **Veri Tipleri:** Jackson, Java'nın temel veri tiplerinin yanı sıra, koleksiyonlar (listeler, map'ler vb.) ve kullanıcı tanımlı tipleri de destekler.
+
+5. **Tree Model:** Jackson, JSON verisini ağaç yapısı olarak da temsil edebilir, bu sayede JSON nesnesinin belirli bölümlerine doğrudan erişim sağlar.
+
+6. **Streaming API:** Jackson, JSON okuma ve yazma işlemleri için bir streaming API sunar. Bu, büyük JSON verileriyle çalışırken bellek tüketimini minimize eder.
+
+7. **Genişletilebilirlik:** Jackson, kullanıcıların kendi serialization ve deserialization işlevlerini tanımlamalarına olanak tanır.
+
+Java dünyasında JSON ile çalışırken Jackson, genellikle ilk tercih edilen kütüphanedir. Spring Boot gibi modern Java çerçeveleri de bu kütüphaneyi varsayılan olarak kullanmaktadır.
+ */
