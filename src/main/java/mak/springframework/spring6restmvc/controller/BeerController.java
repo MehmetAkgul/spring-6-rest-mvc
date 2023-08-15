@@ -19,13 +19,19 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/beer")
+@RequestMapping
 public class BeerController {
+
+    public static final  String BEER_PATH="/api/v1/beer";
+    public static final  String BEER_PATH_ID=BEER_PATH+ "/{id}";
+
+
+
     private final BeerService beerService;
 
 
-    @PatchMapping("{beerId}")
-    public ResponseEntity patchById(@PathVariable("beerId") UUID beerId, @RequestBody Beer beer) {
+    @PatchMapping(BEER_PATH_ID)
+    public ResponseEntity patchById(@PathVariable("id") UUID beerId, @RequestBody Beer beer) {
 
         beerService.patchedById(beerId,beer);
 
@@ -33,14 +39,14 @@ public class BeerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping(BEER_PATH_ID)
     public ResponseEntity deleteById(@PathVariable UUID id){
         beerService.deleteById(id);
         return  new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("{beerId}")
-    public ResponseEntity updateById(@PathVariable("beerId") UUID beerId, @RequestBody Beer beer) {
+    @PutMapping(BEER_PATH_ID)
+    public ResponseEntity updateById(@PathVariable("id") UUID beerId, @RequestBody Beer beer) {
 
      beerService.updateById(beerId,beer);
 
@@ -48,7 +54,7 @@ public class BeerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping
+    @PostMapping(BEER_PATH)
     // @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity handlePost(@RequestBody Beer beer) {
         Beer savedBeer = beerService.saveNewBeer(beer);
@@ -58,14 +64,14 @@ public class BeerController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping(value= BEER_PATH)
     public List<Beer> listBeer() {
         return beerService.listBeers();
     }
 
-    @RequestMapping(value = "/{beerId}", method = RequestMethod.GET)
-    public Beer getBeerById(@PathVariable UUID beerId) {
+    @GetMapping(value= BEER_PATH_ID)
+    public Beer getBeerById(@PathVariable UUID id) {
        // log.debug("Get Beer By Id - in controller");
-        return beerService.getBeerById(beerId);
+        return beerService.getBeerById(id);
     }
 }
