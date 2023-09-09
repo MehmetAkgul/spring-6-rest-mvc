@@ -3,7 +3,7 @@ package mak.springframework.spring6restmvc.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mak.springframework.spring6restmvc.model.Customer;
+import mak.springframework.spring6restmvc.model.CustomerDTO;
 import mak.springframework.spring6restmvc.service.CustomerService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class CustomerController {
 
 
     @PatchMapping(CUSTOMER_PATH_ID)
-    public ResponseEntity patchedById(@PathVariable UUID id, @RequestBody Customer customer) {
+    public ResponseEntity patchedById(@PathVariable UUID id, @RequestBody CustomerDTO customer) {
         customerService.patchedById(id, customer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
@@ -40,26 +40,26 @@ public class CustomerController {
     }
 
     @PutMapping(CUSTOMER_PATH_ID)
-    public ResponseEntity updatedById(@PathVariable UUID id, @RequestBody Customer customer) {
+    public ResponseEntity updatedById(@PathVariable UUID id, @RequestBody CustomerDTO customer) {
         customerService.updatedById(id, customer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(value = CUSTOMER_PATH)
-    public ResponseEntity saveCustomer(@RequestBody Customer customer) {
-        Customer savedCustomer = customerService.save(customer);
+    public ResponseEntity saveCustomer(@RequestBody CustomerDTO customer) {
+        CustomerDTO savedCustomer = customerService.save(customer);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/app/v1/customer/" + savedCustomer.getId().toString());
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
     @GetMapping(value = CUSTOMER_PATH)
-    public List<Customer> listCustomers() {
+    public List<CustomerDTO> listCustomers() {
         return customerService.listCustomers();
     }
 
     @GetMapping(value = CUSTOMER_PATH_ID)
-    public Customer getCustomerById(@PathVariable UUID id) {
+    public CustomerDTO getCustomerById(@PathVariable UUID id) {
         log.debug("Get Customer By Id - in controller err3rete ");
         return customerService.getCustomerById(id).orElseThrow(NotFoundException::new);
     }
