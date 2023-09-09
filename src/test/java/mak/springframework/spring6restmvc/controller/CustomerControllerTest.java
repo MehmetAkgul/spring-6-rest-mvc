@@ -46,11 +46,7 @@ class CustomerControllerTest {
     void testDelete() throws Exception {
         Customer customer = customerServiceImpl.listCustomers().get(0);
 
-        mockMvc.perform(
-                        delete(CustomerController.CUSTOMER_PATH_ID,customer.getId())
-                                .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete(CustomerController.CUSTOMER_PATH_ID, customer.getId()).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
         ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteById(uuidArgumentCaptor.capture());
 
@@ -61,13 +57,7 @@ class CustomerControllerTest {
     @Test
     void testUpdate() throws Exception {
         Customer customer = customerServiceImpl.listCustomers().get(0);
-        mockMvc.perform(
-                        put(CustomerController.CUSTOMER_PATH_ID,customer.getId())
-                                .accept(MediaType.APPLICATION_JSON)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(customer))
-                )
-                .andExpect(status().isNoContent());
+        mockMvc.perform(put(CustomerController.CUSTOMER_PATH_ID, customer.getId()).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(customer))).andExpect(status().isNoContent());
         verify(customerService).updatedById(any(UUID.class), any(Customer.class));
 
     }
@@ -80,32 +70,25 @@ class CustomerControllerTest {
         customer.setId(null);
         customer.setVersion(null);
 
-        given(customerService.save(any(Customer.class)))
-                .willReturn(customerServiceImpl.listCustomers().get(1));
+        given(customerService.save(any(Customer.class))).willReturn(customerServiceImpl.listCustomers().get(1));
 
-        mockMvc.perform(
-                        post(CustomerController.CUSTOMER_PATH)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(customer))
-                )
-                .andExpect(status().isCreated())
-                .andExpect(header().exists("Location"));
+        mockMvc.perform(post(CustomerController.CUSTOMER_PATH).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(customer))).andExpect(status().isCreated()).andExpect(header().exists("Location"));
 
 
     }
 
     @Test
     void listCustomers() throws Exception {
-        given(customerService.listCustomers())
-                .willReturn(customerServiceImpl.listCustomers());
+        given(customerService.listCustomers()).willReturn(customerServiceImpl.listCustomers());
 
-        mockMvc.perform(
-                        get(CustomerController.CUSTOMER_PATH)
-                                .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()", is(3)));
+        mockMvc.perform(get(CustomerController.CUSTOMER_PATH).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(jsonPath("$.length()", is(3)));
+    }
+
+    @Test
+    void getCustomerByIdNotFound() throws Exception {
+        given(customerService.getCustomerById(any(UUID.class))).willThrow(NotFoundException.class);
+
+        mockMvc.perform(get(CustomerController.CUSTOMER_PATH_ID, UUID.randomUUID())).andExpect(status().isNotFound());
     }
 
     @Test
@@ -114,15 +97,9 @@ class CustomerControllerTest {
 
         given(customerService.getCustomerById(testCustomer.getId())).willReturn(testCustomer);
 
-        mockMvc.perform(
-                        get(CustomerController.CUSTOMER_PATH_ID,testCustomer.getId())
-                                .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(CustomerController.CUSTOMER_PATH_ID, testCustomer.getId()).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 //.andExpect(jsonPath("$.id", is(testBeer.getId().toString())))
-                .andExpect(jsonPath("$.id", is(testCustomer.getId().toString())))
-                .andExpect(jsonPath("$.customerName", is(testCustomer.getCustomerName())));
+                .andExpect(jsonPath("$.id", is(testCustomer.getId().toString()))).andExpect(jsonPath("$.customerName", is(testCustomer.getCustomerName())));
 
     }
 }

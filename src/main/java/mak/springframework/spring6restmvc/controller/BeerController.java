@@ -1,7 +1,7 @@
 package mak.springframework.spring6restmvc.controller;
 
 
- import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mak.springframework.spring6restmvc.model.Beer;
 import mak.springframework.spring6restmvc.service.BeerService;
@@ -22,9 +22,8 @@ import java.util.UUID;
 @RequestMapping
 public class BeerController {
 
-    public static final  String BEER_PATH="/api/v1/beer";
-    public static final  String BEER_PATH_ID=BEER_PATH+ "/{id}";
-
+    public static final String BEER_PATH = "/api/v1/beer";
+    public static final String BEER_PATH_ID = BEER_PATH + "/{id}";
 
 
     private final BeerService beerService;
@@ -33,22 +32,22 @@ public class BeerController {
     @PatchMapping(BEER_PATH_ID)
     public ResponseEntity patchById(@PathVariable("id") UUID beerId, @RequestBody Beer beer) {
 
-        beerService.patchedById(beerId,beer);
+        beerService.patchedById(beerId, beer);
 
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(BEER_PATH_ID)
-    public ResponseEntity deleteById(@PathVariable UUID id){
+    public ResponseEntity deleteById(@PathVariable UUID id) {
         beerService.deleteById(id);
-        return  new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(BEER_PATH_ID)
     public ResponseEntity updateById(@PathVariable("id") UUID beerId, @RequestBody Beer beer) {
 
-     beerService.updateById(beerId,beer);
+        beerService.updateById(beerId, beer);
 
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -64,14 +63,16 @@ public class BeerController {
     }
 
 
-    @GetMapping(value= BEER_PATH)
+    @GetMapping(value = BEER_PATH)
     public List<Beer> listBeer() {
         return beerService.listBeers();
     }
 
-    @GetMapping(value= BEER_PATH_ID)
+
+
+    @GetMapping(value = BEER_PATH_ID)
     public Beer getBeerById(@PathVariable UUID id) {
-       // log.debug("Get Beer By Id - in controller");
+        // log.debug("Get Beer By Id - in controller");
         return beerService.getBeerById(id);
     }
 }
