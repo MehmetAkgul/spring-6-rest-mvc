@@ -32,6 +32,17 @@ class BeerControllerIT {
     @Autowired
     BeerMapper beerMapper;
 
+    @Rollback
+    @Transactional
+    @Test
+    void testDeleteByIdFound() {
+        Beer beer = beerRepository.findAll().get(0);
+        ResponseEntity responseEntity = beerController.deleteById(beer.getId());
+
+        assertThat(beerRepository.findById(beer.getId()).isEmpty());
+
+    }
+
     @Test
     void testUpdateNotFound() {
         assertThrows(NotFoundException.class, () -> {
@@ -39,6 +50,8 @@ class BeerControllerIT {
         });
     }
 
+    @Rollback
+    @Transactional
     @Test
     void updateExistingBeer() {
         Beer beer = beerRepository.findAll().get(0);
