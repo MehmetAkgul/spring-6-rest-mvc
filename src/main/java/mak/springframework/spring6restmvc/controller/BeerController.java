@@ -47,7 +47,9 @@ public class BeerController { // option and enter
     @PutMapping(BEER_PATH_ID)
     public ResponseEntity updateById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
 
-        beerService.updateById(beerId, beer);
+        if (beerService.updateById(beerId, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
 
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -67,7 +69,6 @@ public class BeerController { // option and enter
     public List<BeerDTO> listBeer() {
         return beerService.listBeers();
     }
-
 
 
     @GetMapping(value = BEER_PATH_ID)
