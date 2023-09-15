@@ -47,6 +47,8 @@ class CustomerControllerTest {
     void testDelete() throws Exception {
         CustomerDTO customer = customerServiceImpl.listCustomers().get(0);
 
+        given(customerService.deleteById(any())).willReturn(true);
+
         mockMvc.perform(delete(CustomerController.CUSTOMER_PATH_ID, customer.getId()).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
         ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteById(uuidArgumentCaptor.capture());
@@ -58,6 +60,10 @@ class CustomerControllerTest {
     @Test
     void testUpdate() throws Exception {
         CustomerDTO customer = customerServiceImpl.listCustomers().get(0);
+
+        given(customerService.updatedById(any(), any())).willReturn(Optional.of(customer));
+
+
         mockMvc.perform(put(CustomerController.CUSTOMER_PATH_ID, customer.getId()).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(customer))).andExpect(status().isNoContent());
         verify(customerService).updatedById(any(UUID.class), any(CustomerDTO.class));
 

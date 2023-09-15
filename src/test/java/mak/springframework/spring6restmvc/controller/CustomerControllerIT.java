@@ -32,14 +32,64 @@ class CustomerControllerIT {
     @Autowired
     private CustomerMapper customerMapper;
 
+    @Test
+    void testCustomerDeleteByIdNotFound() {
+        assertThrows(NotFoundException.class, () -> {
+            customerController.deleteById(UUID.randomUUID());
+        });
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void testCustomerDeleteByIdFound() {
+        //1. database den ilk siradaki customeri cekelim
+        Customer customer = customerRepository.findAll().get(0);
+        //2. controllerdaki endpont ile silelim
+        ResponseEntity responseEntity = customerController.deleteById(customer.getId());
+        //3 silidigini ispat icin silinen customerin id'si ile databasede sorgulama yapalim
+        assertThat(customerRepository.findById(customer.getId())).isEmpty();
+    }
+
+    @Test
+    void testUpdateNotFound() {
+        assertThrows(NotFoundException.class, () -> {
+            customerController.updatedById(UUID.randomUUID(), CustomerDTO.builder().build());
+        });
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void updateExistingCustomer() {
+        //1. olarak database icindeki tum customer listesinden 0. indexli customeri alalim
+        Customer customer = customerRepository.findAll().get(0);
+        //2. olarak bunu mapper ile DTO ya donusturelim
+        CustomerDTO customerDTO = customerMapper.customerToCustomerDTO(customer);
+        //3. olarak id ve version'u null ile setleyelim burada amac sanski payloaddan yeni bir update nesnesi geliyormus gibi davranmak
+        customerDTO.setId(null);
+        customerDTO.setVersion(null);
+        // hataya sebebiyet vermemek icin customerName yi final yaptik cunku bunu daha sonra tekrar kullanacagiz
+        final String customerName = "UPDATED";
+        customerDTO.setCustomerName(customerName);
+
+        //5. olarak az once cektigim var olan customeri guncelleyelim
+        ResponseEntity responseEntity = customerController.updatedById(customer.getId(), customerDTO);
+        //6. olarak donen response icindeki status code'un dogru oldugunu ispat edelim.
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        //7. olarak guncelledgimiz customeri tekrar veritabaninda cekelim ve isimin guncellendigini ispat edelim
+        Customer updateCustomer = customerRepository.findById(customer.getId()).get();
+        //8. simdide ismin guncel oldugunu ispat edelim
+        assertThat(updateCustomer.getCustomerName()).isEqualTo(customerName);
+
+    }
+
     @Rollback
     @Transactional
     @Test
     void testSaveNewCustomer() {
         // once bir dto verisi olustur controllerdaki saveCustomer endpointine
-        CustomerDTO customerDTO = CustomerDTO.builder()
-                .customerName("New Customer ")
-                .build();
+        CustomerDTO customerDTO = CustomerDTO.builder().customerName("New Customer ").build();
         // 2. olarak bu olusturdugun dto yu controllerdaki saveCustomer endpointine gonderiyouz
         ResponseEntity responseEntity = customerController.saveCustomer(customerDTO);
 
