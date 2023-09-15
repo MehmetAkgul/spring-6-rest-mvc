@@ -6,6 +6,7 @@ import mak.springframework.spring6restmvc.model.CustomerDTO;
 import mak.springframework.spring6restmvc.repositories.CustomerRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,7 +71,21 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public void patchedById(UUID id, CustomerDTO customer) {
+    public Optional<CustomerDTO> patchedById(UUID id, CustomerDTO customerDTO) {
 
+        AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
+
+        customerRepository.findById(id).ifPresentOrElse(
+                foundCustomer -> {
+                    if (StringUtils.hasText(customerDTO.getCustomerName())) {
+                        foundCustomer.setCustomerName(customerDTO.getCustomerName());
+                        foundCustomer.setUpdatedDate(LocalDateTime.now());
+                    }
+                    atomicReference.set(Optional.of(customerMapper.customerToCustomerDTO(customerRepository.save(foundCustomer))));
+                }, () -> {
+                    atomicReference.set(Optional.empty());
+                }
+        );
+        return atomicReference.get();
     }
 }

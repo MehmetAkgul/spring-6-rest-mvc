@@ -32,6 +32,42 @@ class CustomerControllerIT {
     @Autowired
     private CustomerMapper customerMapper;
 
+
+
+    @Test
+    void testPatchNotFound() {
+        assertThrows(NotFoundException.class, () -> {
+            customerController.patchedById(UUID.randomUUID(), CustomerDTO.builder().build());
+        });
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void testPatch() {
+        //1. olarak database icindeki tum customer listesinden 0. indexli customeri alalim
+        Customer customer = customerRepository.findAll().get(0);
+        //2. olarak bunu mapper ile DTO ya donusturelim
+        CustomerDTO customerDTO = customerMapper.customerToCustomerDTO(customer);
+        //3. olarak id ve version'u null ile setleyelim burada amac sanski payloaddan yeni bir update nesnesi geliyormus gibi davranmak
+        customerDTO.setId(null);
+        customerDTO.setVersion(null);
+        // hataya sebebiyet vermemek icin customerName yi final yaptik cunku bunu daha sonra tekrar kullanacagiz
+        final String customerName = "UPDATED";
+        customerDTO.setCustomerName(customerName);
+
+        //5. olarak az once cektigim var olan customeri guncelleyelim
+        ResponseEntity responseEntity = customerController.patchedById(customer.getId(), customerDTO);
+        //6. olarak donen response icindeki status code'un dogru oldugunu ispat edelim.
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        //7. olarak guncelledgimiz customeri tekrar veritabaninda cekelim ve isimin guncellendigini ispat edelim
+        Customer updateCustomer = customerRepository.findById(customer.getId()).get();
+        //8. simdide ismin guncel oldugunu ispat edelim
+        assertThat(updateCustomer.getCustomerName()).isEqualTo(customerName);
+
+    }
+
+
     @Test
     void testCustomerDeleteByIdNotFound() {
         assertThrows(NotFoundException.class, () -> {
