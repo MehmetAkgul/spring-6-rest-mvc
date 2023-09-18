@@ -23,9 +23,13 @@ public class BeerDTO {
     @NotNull
     //  Bu anotasyon, bir alanın null olmaması gerektiğini belirtir. Yani, alanın bir değeri olmalıdır, bu değer 0, false veya boş bir dize ("") olabilir.  Sadece null değer kabul edilmez.
     private String beerName;
+    @NotNull
     private String beerStyle;
+    @NotBlank
+    @NotNull
     private String upc;
     private Integer quantityOnHand;
+    @NotNull
     private BigDecimal price;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;

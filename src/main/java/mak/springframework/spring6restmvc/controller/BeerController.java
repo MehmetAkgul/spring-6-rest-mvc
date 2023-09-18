@@ -31,7 +31,7 @@ public class BeerController { // option and enter
 
 
     @PatchMapping(BEER_PATH_ID)
-    public ResponseEntity patchById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
+    public ResponseEntity patchById(@PathVariable("id") UUID beerId,@Validated  @RequestBody BeerDTO beer) {
 
         beerService.patchedById(beerId, beer);
 
@@ -48,7 +48,7 @@ public class BeerController { // option and enter
     }
 
     @PutMapping(BEER_PATH_ID)
-    public ResponseEntity updateById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
+    public ResponseEntity updateById(@PathVariable("id") UUID beerId, @Validated  @RequestBody BeerDTO beer) {
 
         if (beerService.updateById(beerId, beer).isEmpty()) {
             throw new NotFoundException();

@@ -64,6 +64,9 @@ class BeerControllerTest {
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
         Map<String, Object> beerMap = new HashMap<>();
         beerMap.put("beerName", "New Name");
+        beerMap.put("upc", "1234556677");
+        beerMap.put("beerStyle", "New Style");
+        beerMap.put("price", "12.99");
 
         mockMvc.perform(patch(BeerController.BEER_PATH_ID, beer.getId()).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(beerMap))).andExpect(status().isNoContent());
 
@@ -88,7 +91,20 @@ class BeerControllerTest {
     }
 
     @Test
-    void updateBeer() throws Exception {
+    void testUpdateBeerBlankName() throws Exception {
+        BeerDTO beer = beerServiceImpl.listBeers().get(0);
+        beer.setBeerName("");
+        given(beerService.updateById(any(), any())).willReturn(Optional.of(beer));
+
+        mockMvc.perform(put(BeerController.BEER_PATH_ID, beer.getId()).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsBytes(beer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
+
+
+    }
+
+    @Test
+    void testUpdateBeer() throws Exception {
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
 
         given(beerService.updateById(any(), any())).willReturn(Optional.of(beer));
@@ -102,16 +118,17 @@ class BeerControllerTest {
     void testCreateBeerNullBeerName() throws Exception {
         BeerDTO beerDTO = BeerDTO.builder().build();
         given(beerService.saveNewBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers().get(1));
-        MvcResult mvcResult =mockMvc.perform(
+        MvcResult mvcResult = mockMvc.perform(
                         post(BeerController.BEER_PATH)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(beerDTO))
                 )
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(6)))
                 .andReturn();
 
-        System.out.println(mvcResult.getResponse().getContentAsString());
+        //  System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
